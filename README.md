@@ -3,9 +3,9 @@ fyp-uottawa
 
 Final Year Project Repo.
 
-\nGroup Members:
-\nFadl Assaf
-\nHamed Abedini
-\nRashed Albadi
-\nRayan Alsubhi
-\nSajawal Javaid
+Group Members:
+* Fadl Assaf
+* Hamed Abedini
+* Rashed Albadi
+* Rayan Alsubhi
+* Sajawal Javaid
