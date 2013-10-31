@@ -1,65 +1,70 @@
-#A GUI example
+from tkinter import *
+import sys
+def mhello():
+    #mlabel = Label(mGui, text = "Hello World").pack()
+    #put an text box instead of a label
+    mtext = hamed.get() #store the text in mtext
+    mlabel2 = Label(mGui, text = mtext).pack()
 
-import  tkinter
-import  turtle
-import  sys
-
-def main():
-
-    root = tkinter.Tk()
-
-    cv = tkinter.Canvas(root, width = 600, height = 600)
-    cv.pack(side = tkinter.LEFT)
-    root.title("Draw")
-
-    t = turtle.RawTurtle(cv)
-    screen = t.getscreen()
-    screen.setworldcoordinates(0,0,600,600)
-
-    frame = tkinter.Frame(root)
-    frame.pack(side = tkinter.RIGHT, fill = tkinter.BOTH)
-    screen.tracer(0)
-
-    def quitHandler():
-        print("GoodBye")
-        sys.exit(0)
-    quitButton = tkinter.Button(frame, text = "Quit", command = quitHandler)
-    quitButton.pack()
-
-    textLab = tkinter.Label(frame, text = "Text to write")
-    textLab.pack()
-    
-    textVar = tkinter.StringVar()
-    textVar.set("Hello World")
-    textEntry = tkinter.Entry(frame, textvariable = textVar)
-    textEntry.pack()
-
-    def writeHandler():
-        t.write(textVar.get())
-        
-    writeButton = tkinter.Button(frame, text = "Write text", command = writeHandler)
-    writeButton.pack()
-
-
-    def clickHandler(x,y):
-        t.goto(x,y)
-        screen.update()
-
-    screen.onclick(clickHandler)
-
-    def dragHandler(x,y):
-        t.goto(x,y)
-        screen.update()
-
-    t.ondrag(dragHandler)
+def mNew():
+    mlabel3 = Label(mGui, text = "You clicked ""New""").pack()
     
 
+#in 2.7 it's TK() but in 3.3 the case sensitivity is changed
+mGui = Tk()
+hamed = StringVar()
+#setting up the window to the size we want 
+mGui.geometry("450x450+200+200")
+#setting up a title
+mGui.title("My GUI Example")
 
-    tkinter.mainloop()
+#creating a label and putting it on the screen using grid 
+aLabel = Label(text = "My label", fg = "yellow", bg = "black").grid(row = 0, column = 0, sticky = W)
+#aLabel2 = Label(text = "My second label", fg = "black", bg = "yellow").grid(row = 1, column = 0, sticky = W)
+#aLabel3 = Label(text = "My third label", fg = "black", bg = "yellow").grid(row = 0, column = 1)
+#aLabel4 = Label(text = "My fouth label", fg = "black", bg = "yellow").grid(row =1, column = 1)
+#putting the label on the screen using pack
+#the pack command puts everything in the center of the screen 
+#aLabel.pack()
+#aLabel2.pack()
+
+#creating a button and functioning a button work
+aButton = Button(mGui, text = "OK", command = mhello, fg = "red").grid(row = 1, column = 0, sticky = W)
+
+#make an entry box
+#watever is entered in the box -> will be stored in hamed
+mEntry = Entry(mGui, textvariable = hamed).grid(row = 3, column = 0)
+
+
+#menu construction
+#1. make an menu bar
+menubar = Menu(mGui)
+#2. creating the items
+fileMenu = Menu(menubar, tearoff = 0)
+#3. adding list
+fileMenu.add_command(label = "New", command = mNew)
+fileMenu.add_command(label = "Open")
+#fileMenu.add_command(Label = "Open")
+#cascading them into list, call it file and take the file menu list and add it to the menu
+menubar.add_cascade(label = "File", menu = fileMenu)
+#appear it on the screen
+mGui.config(menu = menubar)
 
 
 
 
 
-main()
-    
+
+
+
+
+
+
+
+
+
+
+
+#on a windows machine you need to put this, on linux you don't need to do it
+mGui.mainloop()
+
