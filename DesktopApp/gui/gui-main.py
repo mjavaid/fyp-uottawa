@@ -64,11 +64,13 @@ class GUI:
         menu.add_cascade(label="About", menu=fileMenu)
         self.deskApp.config(menu=menu)
         # Create UI Buttons
-        canvas = Canvas(self.deskApp, height=35, width=450, bg="lightblue")
-        canvas.pack()
-        scanButton = Button(canvas, text="Scan")
-        scanButton.place(x=10,y=7)
-        uploadButton = Button(canvas, text="Upload")
+        canvas1 = Canvas(self.deskApp, height=35, width=450, bg="lightblue")
+        canvas1.place(x = 0, y = 0)
+        canvas2 = Canvas(self.deskApp, height = 30, width = 450, bg ="lightgray")
+        canvas2.place(x = 0, y = 35)
+        scanButton = Button(canvas1, text="Scan")
+        scanButton.place(x= 10,y=7)
+        uploadButton = Button(canvas1, text="Upload")
         uploadButton.place(x=60,y=7)
 
     def runGUI(self):
