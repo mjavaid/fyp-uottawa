@@ -21,7 +21,7 @@ while 1:
     
     data = conn.recv(BUFFER_SIZE) # recives datae (1024 bytes) using conn and store into data 
  
-   if not data: break
+    if not data: break
    
     print ("received data: "), data # print data; Data is the message the users types
     reply = raw_input("Reply: ")
