@@ -3,7 +3,7 @@
 import socket
 
 
-TCP_IP = '' #localhost 
+TCP_IP = 'localhost' #localhost 
 TCP_PORT = 5005
 
 BUFFER_SIZE = 1024  # Normally 1024, but we want fast response
