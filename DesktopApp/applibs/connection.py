@@ -3,6 +3,7 @@ import socket
 DEFAULT_HOST = "localhost"
 DEFAULT_PORT = 80
 DEFAULT_BUFFER_SIZE = 1024
+HOST, PORT = 0, 1
 
 class CONN:
     conn = None
@@ -15,10 +16,15 @@ class CONN:
     def __init__(self):
         self.conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     
-    def connectToRobot(self):
+    def connectToRobot(self, ARGS):
         ERR = self.NO_ERR
+        host, port = None, None
+        if ARGS[HOST]==None: host = DEFAULT_HOST
+        else: host = ARGS[HOST]
+        if ARGS[PORT]==None: port = DEFAULT_PORT
+        else: port = ARGS[PORT]
         try:
-            self.conn.connect((DEFAULT_HOST, DEFAULT_PORT))
+            self.conn.connect((host, port))
             self.connected = True
         except TimeoutError:
             ERR = self.CONN_TIMEOUT_ERR
