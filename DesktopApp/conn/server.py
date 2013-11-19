@@ -1,30 +1,41 @@
-#!/usr/bin/env python 
+from socket import *
+import thread
 
-import socket
-
-
-TCP_IP = 'localhost' #localhost 
-TCP_PORT = 5005
-
-BUFFER_SIZE = 1024  # Normally 1024, but we want fast response
-
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.bind((TCP_IP, TCP_PORT)) #double (()) coz connect takes 1 para
-s.listen(1) # how many connections it can receive at one time
-print ("Server is running....!")
-conn, addr = s.accept() # accept the connection 
-
-print ("Connection address:"), addr #print the address of the client 
+BUFF = 1024
+HOST = 'localhost'# must be input parameter 
+PORT = 5005 # must be input parameter 
 
 
-while 1:
-    
-    data = conn.recv(BUFFER_SIZE) # recives datae (1024 bytes) using conn and store into data 
- 
-    if not data: break
-   
-    print ("received data: "), data # print data; Data is the message the users types
-    reply = raw_input("Reply: ")
-    conn.sendall(reply)  # send all will send to all client connected 
-    
-conn.close()
+def response(key):
+    return 'Server response: ' + key
+
+
+
+
+
+def handler(clientsock,addr):
+    while 1:
+        data = clientsock.recv(BUFF)
+        if not data: break
+        print repr(addr) + ' recv:' + repr(data)
+        clientsock.send(response(data))
+        print repr(addr) + ' sent:' + repr(response(data))
+        if "close" == data.rstrip(): break # type 'close' on client console to close connection from the server side
+
+    clientsock.close()
+    print addr, "- closed connection" #log on console
+
+
+
+
+if __name__=='__main__':
+    ADDR = (HOST, PORT)
+    serversock = socket(AF_INET, SOCK_STREAM)
+    serversock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
+    serversock.bind(ADDR)
+    serversock.listen(5)
+    while 1:
+        print 'waiting for connection... listening on port', PORT
+        clientsock, addr = serversock.accept()
+        print '...connected from:', addr
+        thread.start_new_thread(handler, (clientsock, addr))

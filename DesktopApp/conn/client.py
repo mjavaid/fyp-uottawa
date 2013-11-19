@@ -18,6 +18,7 @@ while 1:
         s.send(MESSAGE)
         print ("watting...")
         data = s.recv(BUFFER_SIZE)
+
         print("Reply: "),data
 	
 s.close()
