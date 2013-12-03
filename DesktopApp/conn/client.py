@@ -17,8 +17,11 @@ while 1:
 		
         MESSAGE = raw_input("Ur message: ")
         c = "close"
-    
-        if MESSAGE !="close":
+        print "ENTERED: ", MESSAGE
+        
+        if MESSAGE == "":
+        	print "No Data Interd"
+        elif MESSAGE != c:
         	s.send(MESSAGE)
         	print ("watting...")
         	data = s.recv(BUFFER_SIZE)
@@ -26,8 +29,6 @@ while 1:
         elif c == MESSAGE:
         	print "server closed"
         	break
-        else:
-        	print "not data interd"
 	
 s.close()
 
