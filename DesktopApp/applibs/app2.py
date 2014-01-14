@@ -14,12 +14,14 @@ except ImportError:
 
 lastx, lasty = 0, 0
 
+plot2DCanvas = None
+
 def xy(event):
     global lastx, lasty
     lastx, lasty = event.x, event.y
 
 def addLine(event):
-    global lastx, lasty
+    global lastx, lasty, plot2DCanvas
     plot2DCanvas.create_line((lastx, lasty, event.x, event.y))
     lastx, lasty = event.x, event.y
 
@@ -58,6 +60,8 @@ def createGUI(app=None):
     if app == None:
         print("No App Provided")
         return
+    
+    global plot2DCanvas
 
     menubar = Menu(app)
     menu_file = Menu(menubar)
@@ -81,18 +85,18 @@ def createGUI(app=None):
     canvasFrame = ttk.Frame(window)
     h = ttk.Scrollbar(canvasFrame, orient=HORIZONTAL)
     v = ttk.Scrollbar(canvasFrame, orient=VERTICAL)
-    plot2DCanvas = Canvas(canvasFrame, scrollregion=(0, 0, 700, 700), width=500, height=500, yscrollcommand=v.set, xscrollcommand=h.set, bg='#f00')
+    plot2DCanvas = Canvas(canvasFrame, scrollregion=(0, 0, 700, 700), width=500, height=500, yscrollcommand=v.set, xscrollcommand=h.set, bg='#eee')
     h['command'] = plot2DCanvas.xview
     v['command'] = plot2DCanvas.yview
-    ttk.Sizegrip(canvasFrame).grid(column=1, row=1, sticky=(S,E))
+    ttk.Sizegrip(canvasFrame).grid(column=1, row=1, sticky=(N,W,S,E))
     plot2DCanvas.grid(column=0, row=0, sticky=(N,S,E,W))
     h.grid(column=0,row=1,sticky=(W,E))
     v.grid(column=1,row=0,sticky=(N,S))
     canvasFrame.grid_columnconfigure(0,weight=1)
     canvasFrame.grid_rowconfigure(0, weight=1)
 
-    #plot2DCanvas.bind("<Button-1>", xy)
-    #plot2DCanvas.bind("<B1-Motion>", addLine)
+    plot2DCanvas.bind("<Button-1>", lambda event: xy(event))
+    plot2DCanvas.bind("<B1-Motion>", lambda event: addLine(event))
 
     """canvasFrame = ttk.Frame(window, width=500, height=500)
     canvasFrame.rowconfigure(0, weight=1)
