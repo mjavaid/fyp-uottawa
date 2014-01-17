@@ -1,5 +1,5 @@
-from tkinter import *
-from tkinter import messagebox
+from Tkinter import *
+import tkMessageBox as messagebox
 import sys
 import connection
 
