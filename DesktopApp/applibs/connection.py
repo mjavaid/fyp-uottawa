@@ -4,6 +4,35 @@ DEFAULT_HOST = "localhost"
 DEFAULT_PORT = 80
 DEFAULT_BUFFER_SIZE = 1024
 HOST, PORT = 0, 1
+CONNECTED = False
+
+CONNECTION = None
+
+NO_ERR, CONN_TIMEOUT_ERR, CONN_REFUSED_ERR = 0, 1, 2
+
+def connect(destination=None):
+    ERR = NO_ERR
+    if dest == None: host, port = DEFAULT_HOST, DEFAULT_PORT
+    else: host, port = dest[HOST], dest[PORT]
+    try:
+        CONNECTION = socket.socket((socket.AF_INET, socket.SOCK_STREAM))
+        connection.connect((host,port))
+        CONNECTION = True
+    except TimeoutError:
+        ERR = CONN_TIMEOUT_ERR
+    except ConnectionRefusedError:
+        ERR = CONN_REFUSED_ERR
+    return ERR
+    print("TODO: Connect")
+
+def isConnected():
+    return CONNECTED
+
+def sendMessage(msg):
+    print("TODO: Send Message")
+
+def handleMessage(msg):
+    print("TODO: Handle Message")
 
 class CONN:
     conn = None
