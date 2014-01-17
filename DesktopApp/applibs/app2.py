@@ -23,12 +23,12 @@ class APPLICATION(Tk):
         self.option_add("*tearOff", FALSE)
         self.COMMAND = StringVar()
         self.createGUI()
-        self.bind('<Command-u>', uploadHandler)
-        self.bind('<Control-u>', uploadHandler)
-        self.bind('<Command-e>', executeHandler)
-        self.bind('<Control-e>', executeHandler)
-        self.bind('<Command-r>', connectHandler)
-        self.bind('<Control-r>', connectHandler)
+        self.bind('<Command-u>', self.uploadHandler)
+        self.bind('<Control-u>', self.uploadHandler)
+        self.bind('<Command-e>', self.executeHandler)
+        self.bind('<Control-e>', self.executeHandler)
+        self.bind('<Command-r>', self.connectHandler)
+        self.bind('<Control-r>', self.connectHandler)
     
     def createGUI(self):
         """ Menubar """
@@ -54,32 +54,32 @@ class APPLICATION(Tk):
         self.configure(menu=menubar)
         """ End_Menubar """
         
-        window = ttk.Frame(self, padding=(5,5))
+        window = ttk.Frame(self)
         
         """ Action_Buttons """
-        actionFrame = ttk.Frame(window)
+        actionFrame = ttk.Frame(window, padding=(5,5))
         
-        uploadBtn = ttk.Button(actionFrame, text="Upload", commmand=self.uploadHandler)
+        uploadBtn = ttk.Button(actionFrame, text="Upload", command=self.uploadHandler)
         connectBtn = ttk.Button(actionFrame, text="Connect", command=self.connectHandler)
         
         uploadBtn.grid(column=0, row=0, sticky=(W))
         connectBtn.grid(column=1, row=0, sticky=(W))
         
-        actionFrame.grid(column=0, row=0)
+        actionFrame.grid(column=0, row=0, sticky=(N,S,E,W))
         """ End_Action_Button """
         
         ttk.Separator(window, orient=HORIZONTAL).grid(column=0, row=1, sticky=(E,W))
         
         """ Command_Execute_UI """
-        executeFrame = ttk.Frame(window)
+        executeFrame = ttk.Frame(window, padding=(5,5))
         
         cmdEntry = ttk.Entry(executeFrame, textvariable=self.COMMAND)
         executeBtn = ttk.Button(executeFrame, text="Execute", command=self.executeHandler)
         
-        cmdEntry.grid(column=0, row=0, sticky=(E,W))
-        executeBtn.grid(column=0, row=1, sticky=(W))
+        cmdEntry.grid(column=0, row=0, sticky=(W))
+        executeBtn.grid(column=1, row=0, sticky=(W))
         
-        executeFrame.grid(column=0, row=2)
+        executeFrame.grid(column=0, row=2, sticky=(N,S,E,W))
         """ End_Command_Execute_UI """
         
         window.grid(column=0, row=0, sticky=(N,S,E,W))
@@ -108,7 +108,7 @@ class APPLICATION(Tk):
     def aboutHandler(self):
         print("TODO: About")
     
-    def aboutHandler(self):
+    def manualHandler(self):
         print("TODO: Manual")
     
     def quitHandler(self):
