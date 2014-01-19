@@ -46,6 +46,7 @@ class APPLICATION(Tk):
         
         filemenu = Menu(menubar)
         filemenu.add_command(label="Upload", command=self.uploadHandler)
+        filemenu.add_command(label="Save", command=self.saveHandler)
         filemenu.add_separator()
         filemenu.add_command(label="Exit", command=self.quitHandler)
         
@@ -71,10 +72,13 @@ class APPLICATION(Tk):
         actionFrame = ttk.Frame(window, padding=(5,5))
         
         uploadBtn = ttk.Button(actionFrame, text="Upload", command=self.uploadHandler)
+        saveBtn = ttk.Button(actionFrame, text="Save", command=self.saveHandler)
+        ttk.Separator(actionFrame, orient=VERTICAL).grid(column=2, row=0, sticky=(N,S), padx=5)
         connectBtn = ttk.Button(actionFrame, text="Connect", command=self.connectHandler)
         
         uploadBtn.grid(column=0, row=0, sticky=(W))
-        connectBtn.grid(column=1, row=0, sticky=(W))
+        saveBtn.grid(column=1, row=0, sticky=(W))
+        connectBtn.grid(column=3, row=0, sticky=(W))
         
         actionFrame.grid(column=0, row=0, sticky=(N,S,E,W))
         """ End_Action_Button """
@@ -88,7 +92,7 @@ class APPLICATION(Tk):
         executeBtn = ttk.Button(executeFrame, text="Execute", command=self.executeHandler)
         
         cmdEntry.grid(column=0, row=0, sticky=(W))
-        executeBtn.grid(column=1, row=0, sticky=(W))
+        executeBtn.grid(column=1, row=0, sticky=(W), padx=5)
         
         executeFrame.grid(column=0, row=2, sticky=(N,S,E,W))
         """ End_Command_Execute_UI """
@@ -150,6 +154,9 @@ class APPLICATION(Tk):
         if data == None: return
         self.ax.scatter(data['x'], data['y'])
         self.canvas.draw()
+
+    def saveHandler(self):
+        print("TODO: Save")
 
 if __name__ == '__main__':
     app = APPLICATION()
