@@ -1,26 +1,28 @@
+from errno import ECONNREFUSED as ConnectionRefusedError
 import socket
+from socket import timeout as TimeoutError
 
 DEFAULT_HOST = "localhost"
-DEFAULT_PORT = 80
+DEFAULT_PORT = 5004
 DEFAULT_BUFFER_SIZE = 1024
 HOST, PORT = 0, 1
 CONNECTED = False
 
 CONNECTION = None
 
-NO_ERR, CONN_TIMEOUT_ERR, CONN_REFUSED_ERR = 0, 1, 2
+NO_ERR, CONN_TIMEOUT_ERR, CONN_REFUSED_ERR, NOT_CONNECTED_ERR = 0, 1, 2, 3
 
-def connect(destination=None):
+def connect(dest=None):
     ERR = NO_ERR
     if dest == None: host, port = DEFAULT_HOST, DEFAULT_PORT
     else: host, port = dest[HOST], dest[PORT]
     try:
-        CONNECTION = socket.socket((socket.AF_INET, socket.SOCK_STREAM))
-        connection.connect((host,port))
-        CONNECTION = True
+        CONNECTION = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        CONNECTION.connect((host,port))
+        CONNECTED = True
     except TimeoutError:
         ERR = CONN_TIMEOUT_ERR
-    except ConnectionRefusedError:
+    except socket.ConnectionRefusedError:
         ERR = CONN_REFUSED_ERR
     return ERR
     print("TODO: Connect")
@@ -29,12 +31,20 @@ def isConnected():
     return CONNECTED
 
 def sendMessage(msg):
+    ERR = NO_ERR
+    if isConnected():
+        CONNECTION.send(bytes(msg, 'UTF-8'))
+        ERR = NOT_ERR
+    else:
+        ERR = NOT_CONNECTED_ERR
+    return ERR
     print("TODO: Send Message")
 
 def handleMessage(msg):
+    print(msg)
     print("TODO: Handle Message")
 
-class CONN:
+"""class CONN:
     conn = None
     connected = False
     NO_ERR = 0
@@ -69,10 +79,34 @@ class CONN:
         if self.isConnected():
             self.conn.send(bytes(msg, 'UTF-8'))
         else: ERR = self.NOT_CONNECTED_ERR
-        return ERR
+        return ERR"""
         
 if __name__ == "__main__":
-    connection = CONN()
+    """connection = CONN()
     print(connection.connectToRobot())
     print(connection.isConnected())
     print(connection.sendMessage("Hello"))
+    
+    print("IS CONNECTED:", isConnected())
+    print("CONNECTING:", connect())
+    print("SENDING MSG:", sendMessage("Hello"))
+    print("IS CONNECTED:", isConnected())"""
+
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.connect((DEFAULT_HOST, DEFAULT_PORT))
+    while True:
+        command = raw_input('Enter your command: ')
+        print 'CMD:', command
+        if (command.split(' ',1))[0] == 'STORE':
+            print 'CMD STORE!'
+            while True:
+                additional_text = raw_input()
+                command = command + '\n' + additional_text
+                if additional_text == '.': break
+        s.send(command)
+        print 'SENT:', command
+        reply = s.recv(1024)
+        print 'RECEIVED!'
+        if reply == 'Quit': break
+        print reply
+
