@@ -12,6 +12,12 @@ except ImportError:
     import ttk
     import tkFileDialog as filedialog
 
+from numpy import arange, sin, pi
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
+# implement the default mpl key bindings
+from matplotlib.backend_bases import key_press_handler
+from matplotlib.figure import Figure
+
 class APPLICATION(Tk):
     COMMAND = None
     
@@ -42,6 +48,7 @@ class APPLICATION(Tk):
         actionmenu = Menu(menubar)
         actionmenu.add_command(label="Connect", command=self.connectHandler)
         actionmenu.add_command(label="Execute", command=self.executeHandler)
+        actionmenu.add_command(label="Plot", command=self.plotHandler)
         
         helpmenu = Menu(menubar)
         helpmenu.add_command(label="About", command=self.aboutHandler)
@@ -73,7 +80,7 @@ class APPLICATION(Tk):
         """ Command_Execute_UI """
         executeFrame = ttk.Frame(window, padding=(5,5))
         
-        cmdEntry = ttk.Entry(executeFrame, textvariable=self.COMMAND)
+        cmdEntry = ttk.Entry(executeFrame, textvariable=self.COMMAND, width=50)
         executeBtn = ttk.Button(executeFrame, text="Execute", command=self.executeHandler)
         
         cmdEntry.grid(column=0, row=0, sticky=(W))
@@ -81,6 +88,25 @@ class APPLICATION(Tk):
         
         executeFrame.grid(column=0, row=2, sticky=(N,S,E,W))
         """ End_Command_Execute_UI """
+        
+        ttk.Separator(window, orient=HORIZONTAL).grid(column=0, row=3, sticky=(E,W))
+        
+        """ Plotting_Canvas """
+        canvasFrame = ttk.Frame(window)
+        
+        figure = Figure()
+        self.ax = figure.add_subplot(111)
+        
+        self.canvas = FigureCanvasTkAgg(figure, master=canvasFrame)
+        self.canvas.get_tk_widget().grid(column=0, row=0, sticky=(N,S,E,W))
+        self.canvas.show()
+        
+        toolbar = NavigationToolbar2TkAgg(self.canvas, canvasFrame)
+        toolbar.grid(column=0, row=1, sticky=(E,W))
+        toolbar.update()
+        
+        canvasFrame.grid(column=0, row=4)
+        """ End_Plotting_Canvas """
         
         window.grid(column=0, row=0, sticky=(N,S,E,W))
     
@@ -95,7 +121,7 @@ class APPLICATION(Tk):
         if filename == "": return
         fh = open(filename, "r")
         plotData = fh.read()
-        self.processPlotData(plotData)
+        print(plotData)
         fh.close()
         print("TODO: Upload")
     
@@ -114,18 +140,11 @@ class APPLICATION(Tk):
     def quitHandler(self):
         print("TODO: Quit")
         self.quit()
-    
-    def processPlotData(self, plotData=None):
-        if plotData == None:
-            print("No Data Provided")
-            return
-        print("TODO: Process Plot Data")
 
-    def plotData(self, plotData=None):
-        if plotData == None:
-            print("No Data Provided")
-            return
-        print("TODO: Plot Data")
+    def plotHandler(self, data=None):
+        if data == None: return
+        self.ax.scatter(data['x'], data['y'])
+        self.canvas.draw()
 
 if __name__ == '__main__':
     app = APPLICATION()
