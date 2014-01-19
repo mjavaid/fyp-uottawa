@@ -11,7 +11,7 @@ def findNewXAndY(distance, angle, oldX, oldY):
     if (angle >= 0 and angle <= RAD_180):
         return (distance * cos(angle), distance * sin(angle), NO_ERR)
     elif (angle > RAD_180 and angle <= RAD_360):
-        return (distance * sin(angle), distance * cos(angle), NO_ERR)
+        return (distance * cos(angle), distance * sin(angle), NO_ERR)
     else: return (x, y, INVALID_ARGS)
 	
 if __name__ == "__main__":
