@@ -7,10 +7,14 @@ try:
     from tkinter import *
     from tkinter import ttk
     from tkinter import filedialog
+    from tkinter import messagebox
 except ImportError:
     from Tkinter import *
     import ttk
     import tkFileDialog as filedialog
+    import tkMessageBox as messagebox
+
+import csv
 
 from numpy import arange, sin, pi
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
@@ -120,10 +124,11 @@ class APPLICATION(Tk):
         ))
         if filename == "": return
         fh = open(filename, "r")
-        plotData = fh.read()
-        print(plotData)
+        fileContents = (fh.read()).split("\n")
+        plotData = [result.split(",") for result in fileContents if result != ""]
+        for plot in plotData:
+            self.plotHandler({'x': plot[0], 'y': plot[1]})
         fh.close()
-        print("TODO: Upload")
     
     def connectHandler(self):
         print("TODO: Connect")
@@ -138,8 +143,8 @@ class APPLICATION(Tk):
         print("TODO: Manual")
     
     def quitHandler(self):
-        print("TODO: Quit")
-        self.quit()
+        shouldQuit = messagebox.askquestion("Quit", "Exit the application?", icon="warning")
+        if shouldQuit == "yes": self.quit()
 
     def plotHandler(self, data=None):
         if data == None: return
