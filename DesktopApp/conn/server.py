@@ -5,13 +5,8 @@ BUFF = 1024
 HOST = 'localhost'# must be input parameter 
 PORT = 5005 # must be input parameter 
 
-
 def response(key):
     return 'Server response: ' + key
-
-
-
-
 
 def handler(clientsock,addr):
     while 1:
@@ -25,9 +20,6 @@ def handler(clientsock,addr):
     clientsock.close()
     print addr, "- closed connection" #log on console
 
-
-
-
 if __name__=='__main__':
     ADDR = (HOST, PORT)
     serversock = socket(AF_INET, SOCK_STREAM)
@@ -39,3 +31,5 @@ if __name__=='__main__':
         clientsock, addr = serversock.accept()
         print '...connected from:', addr
         thread.start_new_thread(handler, (clientsock, addr))
+
+serversock.close()
