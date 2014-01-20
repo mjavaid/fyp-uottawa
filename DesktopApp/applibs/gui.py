@@ -162,7 +162,7 @@ class Application(Tk):
         portEntry = ttk.Entry(actionFrame, textvariable=PORT)
         
         connectBtn = ttk.Button(actionFrame, text="Connect", command=lambda: self.testConnect(connectWindow, HOST, PORT))
-        useDefaultBtn = ttk.Button(actionFrame, text="Use Default", command=None)
+        useDefaultBtn = ttk.Button(actionFrame, text="Use Default", command=lambda: self.testConnect(connectWindow))
         cancleBtn = ttk.Button(actionFrame, text="Cancel", command=connectWindow.destroy)
         
         hostLabel.grid(column=0, row=0, sticky=(E), padx=5)
@@ -178,7 +178,7 @@ class Application(Tk):
         
         print("TODO: Connect")
     
-    def testConnect(self, connectWindow, host, port):
+    def testConnect(self, connectWindow, host=None, port=None):
         createConnection(host, port)
         connectWindow.destroy()
     
@@ -233,15 +233,15 @@ class connectionThread(threading.Thread):
                 plotData = data.split(",")
                 plotData[0], plotData[1] = int(plotData[0]), int(plotData[1])
                 App.plotHandler(plotData)
-                time.sleep(2)
 
 def createApplication():
     global App
     App = Application()
     return App
 
-def createConnection(host, port):
-    connection = connectionThread(1, "connection", host.get(), int(port.get()))
+def createConnection(host=None, port=None):
+    if not host == None and not port == None: host, port = host.get(), int(port.get())
+    connection = connectionThread(1, "connection", host, port)
     connection.start()
 
 if __name__ == '__main__':
