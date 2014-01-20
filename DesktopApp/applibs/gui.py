@@ -135,7 +135,40 @@ class APPLICATION(Tk):
         fh.close()
     
     def connectHandler(self):
+        connectWindow = Toplevel()
+        connectWindow.title("Connect To Robot")
+        connectWindow.resizable(False, False)
+        
+        HOST = StringVar()
+        PORT = StringVar()
+        
+        actionFrame = ttk.Frame(connectWindow, padding=(10, 10))
+        
+        hostLabel = ttk.Label(actionFrame, text="Host:")
+        portLabel = ttk.Label(actionFrame, text="Port:")
+        
+        hostEntry = ttk.Entry(actionFrame, textvariable=HOST)
+        portEntry = ttk.Entry(actionFrame, textvariable=PORT)
+        
+        connectBtn = ttk.Button(actionFrame, text="Connect", command=lambda: self.testConnect(HOST, PORT))
+        useDefaultBtn = ttk.Button(actionFrame, text="Use Default", command=None)
+        cancleBtn = ttk.Button(actionFrame, text="Cancel", command=connectWindow.destroy)
+        
+        hostLabel.grid(column=0, row=0, sticky=(E), padx=5)
+        hostEntry.grid(column=1, row=0, sticky=(E,W))
+        portLabel.grid(column=0, row=1, sticky=(E), padx=5)
+        portEntry.grid(column=1, row=1, sticky=(E,W))
+        ttk.Separator(actionFrame, orient=HORIZONTAL).grid(row=2, columnspan=3, sticky=(E,W), pady=10)
+        connectBtn.grid(column=0, row=3)
+        useDefaultBtn.grid(column=1, row=3)
+        cancleBtn.grid(column=2, row=3)
+        
+        actionFrame.grid(column=0, row=0, sticky=(N,S,E,W))
+        
         print("TODO: Connect")
+    
+    def testConnect(self, host, port):
+        print(host.get(),port.get())
     
     def executeHandler(self):
         print("TODO: Execute")
