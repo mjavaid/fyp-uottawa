@@ -38,14 +38,14 @@ def sendMessage(msg):
         CONNECTION.send(msg)
         ERR = NO_ERR
         data = CONNECTION.recv(DEFAULT_BUFFER_SIZE)
-        handleMessage(data)
+        data = handleMessage(data)
     else:
         ERR = NOT_CONNECTED_ERR
-    return ERR
+    return (ERR, data)
 
 def handleMessage(msg):
-    print("MESSAGE: %s" % msg)
     print("TODO: Handle Message")
+    return msg
 
 def closeConnection():
     global CONNECTION, CONNECTED
