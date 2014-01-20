@@ -16,13 +16,22 @@ except ImportError:
 
 import csv
 
+import time
+
 from numpy import arange, sin, pi
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
 # implement the default mpl key bindings
 from matplotlib.backend_bases import key_press_handler
 from matplotlib.figure import Figure
 
-class APPLICATION(Tk):
+import threading
+import connection as conn
+
+App = None
+Connection = None
+closeConnection = False
+
+class Application(Tk):
     COMMAND = None
     
     def __init__(self, *args, **kwargs):
@@ -75,10 +84,12 @@ class APPLICATION(Tk):
         saveBtn = ttk.Button(actionFrame, text="Save", command=self.saveHandler)
         ttk.Separator(actionFrame, orient=VERTICAL).grid(column=2, row=0, sticky=(N,S), padx=5)
         connectBtn = ttk.Button(actionFrame, text="Connect", command=self.connectHandler)
+        disconnectBtn = ttk.Button(actionFrame, text="Disconnect", command=self.disconnectHandler)
         
         uploadBtn.grid(column=0, row=0, sticky=(W))
         saveBtn.grid(column=1, row=0, sticky=(W))
         connectBtn.grid(column=3, row=0, sticky=(W))
+        disconnectBtn.grid(column=4, row=0, sticky=(W))
         
         actionFrame.grid(column=0, row=0, sticky=(N,S,E,W))
         """ End_Action_Button """
@@ -150,7 +161,7 @@ class APPLICATION(Tk):
         hostEntry = ttk.Entry(actionFrame, textvariable=HOST)
         portEntry = ttk.Entry(actionFrame, textvariable=PORT)
         
-        connectBtn = ttk.Button(actionFrame, text="Connect", command=lambda: self.testConnect(HOST, PORT))
+        connectBtn = ttk.Button(actionFrame, text="Connect", command=lambda: self.testConnect(connectWindow, HOST, PORT))
         useDefaultBtn = ttk.Button(actionFrame, text="Use Default", command=None)
         cancleBtn = ttk.Button(actionFrame, text="Cancel", command=connectWindow.destroy)
         
@@ -167,8 +178,14 @@ class APPLICATION(Tk):
         
         print("TODO: Connect")
     
-    def testConnect(self, host, port):
-        print(host.get(),port.get())
+    def testConnect(self, connectWindow, host, port):
+        createConnection(host, port)
+        connectWindow.destroy()
+    
+    def disconnectHandler(self):
+        global closeConnection
+        print(conn.sendMessage("CLOSE_CONNECTION"))
+        closeConnection = True
     
     def executeHandler(self):
         print("TODO: Execute")
@@ -185,7 +202,7 @@ class APPLICATION(Tk):
 
     def plotHandler(self, data=None):
         if data == None: return
-        self.ax.scatter(data['x'], data['y'])
+        self.ax.scatter(data[0], data[1])
         self.canvas.draw()
 
     def saveHandler(self):
@@ -194,6 +211,39 @@ class APPLICATION(Tk):
     def executeGUI(self):
         self.mainloop()
 
+class connectionThread(threading.Thread):
+    def __init__(self, threadID, name, host=None, port=None):
+        threading.Thread.__init__(self)
+        self.threadID = threadID
+        self.name = name
+        self.host = host
+        self.port = port
+        
+    def run(self):
+        global closeConnection, App
+        if self.host == None or self.port == None: dest = None
+        else: dest = [self.host, self.port]
+        conn.connect(dest)
+        SEND_DATA_CMD = "GET_DATA_STREAM"
+        _, data = conn.sendMessage(SEND_DATA_CMD)
+        if data == "ACK_GDS":
+            while not closeConnection:
+                SEND_ACK = "ACK"
+                _, data = conn.sendMessage(SEND_ACK)
+                plotData = data.split(",")
+                plotData[0], plotData[1] = int(plotData[0]), int(plotData[1])
+                App.plotHandler(plotData)
+                time.sleep(2)
+
+def createApplication():
+    global App
+    App = Application()
+    return App
+
+def createConnection(host, port):
+    connection = connectionThread(1, "connection", host.get(), int(port.get()))
+    connection.start()
+
 if __name__ == '__main__':
-    app = APPLICATION()
-    app.mainloop()
+    createApplication()
+    App.executeGUI()
