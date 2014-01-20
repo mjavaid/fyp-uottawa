@@ -3,20 +3,34 @@ import thread
 
 BUFF = 1024
 HOST = 'localhost'# must be input parameter 
-PORT = 5005 # must be input parameter 
+PORT = 5005 # must be input parameter
+
+i = 0
 
 def response(key):
     return 'Server response: ' + key
 
 def handler(clientsock,addr):
+    global i
     while 1:
         data = clientsock.recv(BUFF)
         if not data: break
         print repr(addr) + ' recv:' + repr(data)
-        clientsock.send(response(data))
-        print repr(addr) + ' sent:' + repr(response(data))
-        if "close" == data.rstrip(): break # type 'close' on client console to close connection from the server side
+        response = ""
+        if data == "GET_DATA_STREAM":
+            response = "ACK_GDS"
+        elif data == "CLOSE_CONNECTION":
+            response = "ACK_CC"
+            break
+        else:
+            response = str(i)+","+str(i*5)
+            
+        clientsock.send(response)
+        print repr(addr) + ' sent:' + repr(data)
 
+        if "CLOSE_CONNECTION" == data: break
+        i += 1
+    i = 0
     clientsock.close()
     print addr, "- closed connection" #log on console
 
