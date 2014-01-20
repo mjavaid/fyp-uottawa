@@ -4,8 +4,8 @@ import sys
 
 sys.path.append('./applibs/')
 
-from gui import APPLICATION
+from gui import createApplication
 
 if __name__ == "__main__":
-    app = APPLICATION()
+    app = createApplication()
     app.executeGUI()
