@@ -6,14 +6,14 @@ from itertools import izip
 TIME_PER_TILE = 10 / 1000
 LEFT_SERVO_TX = "P9_22"
 RIGHT_SERVO_TX = "P9_14"
-LEFT_SERVO_ON = 100
-LEFT_SERVO_OFF = 0
-RIGHT_SERVO_ON = 0
-RIGHT_SERVO_OFF = 100
+LEFT_SERVO_ON = 0
+LEFT_SERVO_OFF = 100
+RIGHT_SERVO_ON = 98
+RIGHT_SERVO_OFF = 0
 DEGREE_TURN_TIME = 50 / 1000
 SERVO_FREQUENCY = 33
-RIGHT_SERVO_POLARITY = 0
-LEFT_SERVO_POLARITY = 1
+RIGHT_SERVO_POLARITY = 1
+LEFT_SERVO_POLARITY = 0
 # END PLACEHOLDERS
 
 RUNNING = False
@@ -22,36 +22,41 @@ ENABLED = False
 DIRECTIONS = ["FORWARD", "BACKWARDS", "LEFT", "RIGHT"]
 
 def move_forward():
+    global ENABLED, RUNNING
     if not ENABLED: return
-    PWM.set_duty_cycle(LEFT_SERVO_TX, LEFT_SERVO_ON)
-    PWM.set_duty_cycle(RIGHT_SERVO_TX, RIGHT_SERVO_ON)
+    PWM.start(LEFT_SERVO_TX, LEFT_SERVO_ON, SERVO_FREQUENCY,LEFT_SERVO_POLARITY)
+    PWM.start(RIGHT_SERVO_TX, RIGHT_SERVO_ON,SERVO_FREQUENCY,RIGHT_SERVO_POLARITY)
     RUNNING = True
 
 def move_backwards():
     if not ENABLED: return
-    PWM.set_duty_cycle(LEFT_SERVO_TX, LEFT_SERVO_REVERSE_ON)
-    PWM.set_duty_cycle(RIGHT_SERVO_TX, RIGHT_SERVO_REVERSE_ON)
+    PWM.start(LEFT_SERVO_TX, 97,33,1)
+    PWM.start(RIGHT_SERVO_TX,35,33,0)
     RUNNING = True
 
 def turn_left():
+    global ENABLED, RUNNING
     if not ENABLED: return
-    PWM.set_duty_cycle(LEFT_SERVO_TX, LEFT_SERVO_REVERSE_ON)
-    PWM.set_duty_cycle(RIGHT_SERVO_TX, RIGHT_SERVO_ON)
+    PWM.start(LEFT_SERVO_TX, 98,33,1)
+    PWM.start(RIGHT_SERVO_TX, 98,33,1)
     RUNNING = True
 
 def turn_right():
+    global ENABLED, RUNNING
     if not ENABLED: return
-    PWM.set_duty_cycle(LEFT_SERVO_TX, LEFT_SERVO_ON)
-    PWM.set_duty_cycle(RIGHT_SERVO_TX, RIGHT_SERVO_REVERSE_ON)
+    PWM.start(LEFT_SERVO_TX, 0,33,0)
+    PWM.start(RIGHT_SERVO_TX,5,33,0)
     RUNNING = True
 
 def stop():
+    global ENABLED, RUNNING
     if not ENABLED: return
     PWM.set_duty_cycle(LEFT_SERVO_TX, LEFT_SERVO_OFF)
     PWM.set_duty_cycle(RIGHT_SERVO_TX, RIGHT_SERVO_OFF)
     RUNNING = False
     
 def disable():
+    global ENABLED, RUNNING
     if not ENABLED: return
     PWM.stop(LEFT_SERVO_TX)
     PWM.stop(RIGHT_SERVO_TX)
@@ -59,9 +64,10 @@ def disable():
     RUNNING = False
     
 def enable():
+    global ENABLED, RUNNING   
     if ENABLED: return
-    PWM.start(LEFT_SERVO_TX, LEFT_SERVO_OFF, SERVO_FREQUENCY, LEFT_SERVO_POLARITY)
-    PWN.start(RIGHT_SERVO_TX, RIGHT_SERVO_OFF, SERVO_FREQUENCY, RIGHT_SERVO_POLARITY)
+    #PWM.start(LEFT_SERVO_TX, LEFT_SERVO_OFF, SERVO_FREQUENCY, LEFT_SERVO_POLARITY)
+    #PWM.start(RIGHT_SERVO_TX, RIGHT_SERVO_OFF, SERVO_FREQUENCY, RIGHT_SERVO_POLARITY)
     ENABLED = True
     RUNNING = False
 
@@ -144,11 +150,11 @@ if __name__ == "__main__":
             sleep(int(degrees) * DEGREE_TURN_TIME)
         if "FORWARD" in CMD:
             direction, tiles = CMD.split(" ")
-            turn_right()
+            move_forward()
             sleep(int(tiles) * TIME_PER_TILE)
         if "BACKWARDS" in CMD:
             direction, tiles = CMD.split(" ")
-            turn_right()
+            move_backwards()
             sleep(int(tiles) * TIME_PER_TILE)
         if CMD == "ENABLE":
             enable()
