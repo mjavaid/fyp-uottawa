@@ -3,14 +3,14 @@ from time import sleep
 from itertools import izip
 
 # PLACEHOLDERS: Substitute variables with actual values
-TIME_PER_TILE = 10 / 1000
+TIME_PER_TILE = 2.62 #in sceonds
 LEFT_SERVO_TX = "P9_22"
 RIGHT_SERVO_TX = "P9_14"
 LEFT_SERVO_ON = 0
 LEFT_SERVO_OFF = 100
 RIGHT_SERVO_ON = 98
 RIGHT_SERVO_OFF = 0
-DEGREE_TURN_TIME = 50 / 1000
+DEGREE_TURN_TIME = 0.5
 SERVO_FREQUENCY = 33
 RIGHT_SERVO_POLARITY = 1
 LEFT_SERVO_POLARITY = 0
@@ -40,6 +40,8 @@ def turn_left():
     PWM.start(LEFT_SERVO_TX, 98,33,1)
     PWM.start(RIGHT_SERVO_TX, 98,33,1)
     RUNNING = True
+    sleep(DEGREE_TURN_TIME)
+    stop()
 
 def turn_right():
     global ENABLED, RUNNING
