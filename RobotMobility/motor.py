@@ -6,7 +6,7 @@ STARTED = False
 def stop():
     print "Stopping Motors...\n"
     PWM.set_duty_cycle("P9_14",0)
-    #PWM.set_duty_cycle("P9_22",100)
+    PWM.set_duty_cycle("P9_22",100)
 
 def start():
     global RUNNING, STARTED
@@ -14,10 +14,10 @@ def start():
     print "Starting Motors...\n"
     if STARTED:
         PWM.set_duty_cycle("P9_14",97)
-        #PWM.set_duty_cycle("P9_22",5)
+        PWM.set_duty_cycle("P9_22",5)
     else:
         STARTED = True
-        #PWM.start("P9_22",5,33,0)
+        PWM.start("P9_22",5,33,0)
         PWM.start("P9_14",97,33,1)
 
 if __name__ == "__main__":
