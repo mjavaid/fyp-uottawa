@@ -14,8 +14,10 @@ def handler(clientsock,addr):
         print "Client:" + str(addr) + 'Says: '+ data
         
         if data =="All":
-        	lines =text_file.readlines() 
-        	clientsock.send(str(lines))
+        	text_file = open("file.txt", "r") 
+        	lines =text_file.readlines()
+        	lines= [item.rstrip() for item in lines]
+        	clientsock.send(str(lines)+"\n")
     		#for line in lines:
 			#	clientsock.send(line)
 			#	print line   
@@ -27,13 +29,15 @@ def handler(clientsock,addr):
           
         else:
         	clientsock.send(data+"\n")
-        	        
+        	
+        
        
         #clientsock.send(msg)
         if "close" == data.rstrip(): # type 'close' on client console to close connection from the server side
         	clientsock.close()
         	break
     clientsock.close()
+
 
 
 
