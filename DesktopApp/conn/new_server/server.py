@@ -22,7 +22,7 @@ def handler(clientsock,addr):
         elif data =="point":
           for line in text_file:
           	pass
-          clientsock.send(line+"\n")	
+            clientsock.send(line+"\n")	
           
         else:
         	clientsock.send(data+"\n")
