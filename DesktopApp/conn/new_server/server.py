@@ -15,35 +15,25 @@ def handler(clientsock,addr):
         
         if data =="All":
         	lines =text_file.readlines() 
-    		for line in lines:
-				clientsock.send(line)
-				print line   
+        	clientsock.send(str(lines))
+    		#for line in lines:
+			#	clientsock.send(line)
+			#	print line   
         
         elif data =="point":
           for line in text_file:
           	pass
-            clientsock.send(line+"\n")	
+          clientsock.send(line+"\n")	
           
         else:
         	clientsock.send(data+"\n")
-        	
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
+        	        
+       
         #clientsock.send(msg)
         if "close" == data.rstrip(): # type 'close' on client console to close connection from the server side
         	clientsock.close()
         	break
     clientsock.close()
-
 
 
 

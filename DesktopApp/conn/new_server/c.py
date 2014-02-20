@@ -15,7 +15,7 @@ s.connect((HOST, PORT)) #double (()) coz connect takes 1 para
 
 #s.send("Hello im connected")
 
-received_file = open("received_file.txt", "a") 
+
 while 1:
 		
         MESSAGE = raw_input("Ur message: ")
@@ -25,18 +25,20 @@ while 1:
         if MESSAGE == "":
         	print "No Data Interd"
         elif MESSAGE != c:
+        	received_file = open("received_file.txt", "a") 
+        
         	s.send(MESSAGE)
         	print ("watting...")
         	data = s.recv(BUFFER_SIZE)
         	received_file.write(str(data)) # add to the file
-        	
+        	received_file.close()
         	print("Reply: "),data
         elif c == MESSAGE:
         	print "server closed"
         	break
          
         
-received_file.close()
+#received_file.close()
 s.close()
 
 
