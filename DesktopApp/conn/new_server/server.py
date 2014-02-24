@@ -13,11 +13,15 @@ def handler(clientsock,addr):
         
         print "Client:" + str(addr) + 'Says: '+ data
         
-        if data =="All":
+        if data =="all":
         	text_file = open("file.txt", "r") 
         	lines =text_file.readlines()
-        	lines= [item.rstrip() for item in lines]
+        	lines= [item.rstrip() for item in lines] # take out the \n
+        	print "lines as list"
+        	print lines
         	clientsock.send(str(lines)+"\n")
+        	print "lines as string"
+        	print str(lines)
     		#for line in lines:
 			#	clientsock.send(line)
 			#	print line   

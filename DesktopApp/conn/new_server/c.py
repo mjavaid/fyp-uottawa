@@ -1,6 +1,24 @@
 #!/usr/bin/env python
 
 import socket
+import re
+
+
+def sep (str):
+	received_file = open("received_file.txt", "a") 
+	
+	print "str.replace" 
+	str =str.replace(',','\n')
+	print str
+	#pattern =''
+	str=re.sub(r"[\['\]]",'',str) #remove all "[","]"," ' "
+	print "str.sub" 
+	print str
+	
+	received_file.write(str.replace(',','\n'))
+	
+	received_file.close()
+
 
 
 HOST = 'localhost' #localhost 
@@ -23,21 +41,26 @@ while 1:
         print "ENTERED: ", MESSAGE
         
         if MESSAGE == "":
-        	print "No Data Interd"
+        	print "No Data Entered"
+      
+      
         elif MESSAGE != c:
-        	received_file = open("received_file.txt", "a") 
-        
+        	#received_file = open("received_file.txt", "a") 
+    
         	s.send(MESSAGE)
-        	print ("watting...")
+        	print ("waiting...")
         	data = s.recv(BUFFER_SIZE)
-        	received_file.write(str(data)) # add to the file
-        	received_file.close()
+        	sep(data)
+        	#received_file.write(str(data)) # add to the file
+        	#received_file.close()
         	print("Reply: "),data
         elif c == MESSAGE:
         	print "server closed"
         	break
          
-        
+
+
+      
 #received_file.close()
 s.close()
 
