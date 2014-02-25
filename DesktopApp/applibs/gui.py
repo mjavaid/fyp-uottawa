@@ -233,6 +233,7 @@ class connectionThread(threading.Thread):
                 plotData = data.split(",")
                 plotData[0], plotData[1] = int(plotData[0]), int(plotData[1])
                 App.plotHandler(plotData)
+        conn.closeConnection()
 
 def createApplication():
     global App
