@@ -14,17 +14,12 @@ def handler(clientsock,addr):
         print "Client:" + str(addr) + 'Says: '+ data
         
         if data =="all":
-        	text_file = open("file.txt", "r") 
+        	text_file = open("dumpfile.txt", "r") 
         	lines =text_file.readlines()
         	lines= [item.rstrip() for item in lines] # take out the \n
-        	print "lines as list"
-        	print lines
+        	
         	clientsock.send(str(lines)+"\n")
-        	print "lines as string"
-        	print str(lines)
-    		#for line in lines:
-			#	clientsock.send(line)
-			#	print line   
+        	
         
         elif data =="point":
           for line in text_file:
@@ -47,15 +42,15 @@ def handler(clientsock,addr):
 
 
 if __name__=='__main__':
-    HOST = '192.168.1.100'
+    HOST = 'localhost'
     PORT = 5005
-    BUFSIZ = 1024
+    BUFSIZ = 10000
     ADDR = (HOST, PORT)
     serversock = socket(AF_INET, SOCK_STREAM)
     serversock.bind(ADDR)
     serversock.listen(2)
     
-    text_file = open("file.txt", "r") 
+    text_file = open("dumpfile.txt", "r") 
     print 'Server is running'
     while 1:
         print 'waiting for connection...'

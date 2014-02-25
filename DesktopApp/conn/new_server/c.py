@@ -4,27 +4,37 @@ import socket
 import re
 
 
-def sep (str):
+def sep (string):
 	received_file = open("received_file.txt", "a") 
 	
-	print "str.replace" 
-	str =str.replace(',','\n')
-	print str
-	#pattern =''
-	str=re.sub(r"[\['\]]",'',str) #remove all "[","]"," ' "
-	print "str.sub" 
-	print str
+	print "string"
+	print string 
 	
-	received_file.write(str.replace(',','\n'))
+
+	
+	print "string2"
+	print string 
+	
+	
+	string =string.replace(',','\n')
+	#print string
+	#pattern =''
+	string=re.sub(r" [']",'',string) #remove all " " after '
+	string=re.sub(r"[\['\]-]",'',string) #remove all "[","]"," ' "
+
+	print "string.sub" 
+	print string
+	
+	received_file.write(string)
 	
 	received_file.close()
-
+	return string
 
 
 HOST = 'localhost' #localhost 
 PORT = 5005
 
-BUFFER_SIZE = 1024
+BUFFER_SIZE = 10000
 
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -50,18 +60,13 @@ while 1:
         	s.send(MESSAGE)
         	print ("waiting...")
         	data = s.recv(BUFFER_SIZE)
-        	sep(data)
-        	#received_file.write(str(data)) # add to the file
+        	string=sep(data)
+        	#received_file.write(string(data)) # add to the file
         	#received_file.close()
-        	print("Reply: "),data
+        	print"Reply: "+string
         elif c == MESSAGE:
         	print "server closed"
         	break
-         
 
-
-      
 #received_file.close()
 s.close()
-
-
