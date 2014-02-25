@@ -47,7 +47,7 @@ def handler(clientsock,addr):
 
 
 if __name__=='__main__':
-    HOST = 'localhost'
+    HOST = '192.168.1.100'
     PORT = 5005
     BUFSIZ = 1024
     ADDR = (HOST, PORT)
