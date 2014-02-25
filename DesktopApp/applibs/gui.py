@@ -142,7 +142,7 @@ class Application(Tk):
         fileContents = (fh.read()).split("\n")
         plotData = [result.split(",") for result in fileContents if result != ""]
         for plot in plotData:
-            self.plotHandler({'x': plot[0], 'y': plot[1]})
+            self.plotHandler(plot)
         fh.close()
     
     def connectHandler(self):

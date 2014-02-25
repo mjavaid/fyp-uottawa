@@ -1,17 +1,15 @@
 from socket import *
 import thread
+import random
 
 BUFF = 1024
 HOST = 'localhost'# must be input parameter 
 PORT = 5005 # must be input parameter
 
-i = 0
-
 def response(key):
     return 'Server response: ' + key
 
 def handler(clientsock,addr):
-    global i
     while 1:
         data = clientsock.recv(BUFF)
         if not data: break
@@ -23,14 +21,13 @@ def handler(clientsock,addr):
             response = "ACK_CC"
             break
         else:
-            response = str(i)+","+str(i*5)
+            response = str(random.randint(1, 100))+","+str(random.randint(1, 50))
             
         clientsock.send(response)
         print repr(addr) + ' sent:' + repr(data)
 
         if "CLOSE_CONNECTION" == data: break
-        i += 1
-    i = 0
+
     clientsock.close()
     print addr, "- closed connection" #log on console
 
