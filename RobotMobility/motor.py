@@ -10,7 +10,7 @@ LEFT_SERVO_ON = 0
 LEFT_SERVO_OFF = 100
 RIGHT_SERVO_ON = 98
 RIGHT_SERVO_OFF = 0
-DEGREE_TURN_TIME = 0.5
+DEGREE_TURN_TIME = 0.015
 SERVO_FREQUENCY = 33
 RIGHT_SERVO_POLARITY = 1
 LEFT_SERVO_POLARITY = 0
@@ -40,8 +40,6 @@ def turn_left():
     PWM.start(LEFT_SERVO_TX, 98,33,1)
     PWM.start(RIGHT_SERVO_TX, 98,33,1)
     RUNNING = True
-    sleep(DEGREE_TURN_TIME)
-    stop()
 
 def turn_right():
     global ENABLED, RUNNING
@@ -53,8 +51,8 @@ def turn_right():
 def stop():
     global ENABLED, RUNNING
     if not ENABLED: return
-    PWM.set_duty_cycle(LEFT_SERVO_TX, LEFT_SERVO_OFF)
-    PWM.set_duty_cycle(RIGHT_SERVO_TX, RIGHT_SERVO_OFF)
+    PWM.start(LEFT_SERVO_TX, LEFT_SERVO_OFF,33,0)
+    PWM.start(RIGHT_SERVO_TX, RIGHT_SERVO_OFF,33,1)
     RUNNING = False
     
 def disable():
@@ -78,7 +76,7 @@ def getPath(filename):
     try:
         f = open(filename, 'r')
     except IOError:
-        return NO_SUCH_FILE_ERR
+        return NO_SUCH_FILE_ERR,[]
     i = 0
     PATH = []
     for line in f:
@@ -99,6 +97,7 @@ def getPath(filename):
         i += 1
     f.close()
     if len(PATH) % 2 != 0: return INVALID_SYNTAX_ERR, []
+    print PATH
     return NO_ERR, PATH
 
 def executePath(path):
@@ -113,7 +112,7 @@ def executePath(path):
         elif direction == "LEFT": turn_left()
         elif direction == "RIGHT": turn_right()
         sleep(value * factor)
-        
+    stop()   
     
 COMMANDS = {
     "LIST": "Lists all the possible commands",
@@ -145,15 +144,18 @@ if __name__ == "__main__":
         if "LEFT" in CMD:
             direction, degrees = CMD.split(" ")
             turn_left()
-            sleep(int(degrees) * DEGREE_TURN_TIME)
+            sleep((int(degrees)%360) * DEGREE_TURN_TIME)
+            stop()
         if "RIGHT" in CMD:
             direction, degrees = CMD.split(" ")
             turn_right()
-            sleep(int(degrees) * DEGREE_TURN_TIME)
+            sleep((int(degrees)%360) * DEGREE_TURN_TIME)
+            stop()
         if "FORWARD" in CMD:
             direction, tiles = CMD.split(" ")
             move_forward()
             sleep(int(tiles) * TIME_PER_TILE)
+            stop()
         if "BACKWARDS" in CMD:
             direction, tiles = CMD.split(" ")
             move_backwards()
