@@ -101,72 +101,66 @@ int main() {
 
         //  if (y % 2) continue;
         //  if (laserDotArr[y] != -1) {
-                //cvCircle(undistorted,cvPoint(laserDotArr[y],y),2,
-				//y == frameSz.height/2?CV_RGB(255,0,0):CV_RGB(0,255,255));
-
-                    char txtMsg[200];
-                    if ( y == frameSz.height/2) {
-                        sprintf(txtMsg,"x=%.3f.", laserDotArr[y]);
-                        printf("current x=%.3f\n", laserDotArr[y]);
-			printf("distance from middle frame is x=%.3f\n",(laserDotArr[y]-(frameSz.width/2)));
-                        printf("-------------------------------------------------------------------------\n");
-/*cvPutText(undistorted,txtMsg,cvPoint(laserDotArr[y],y),stdFont, 
-cvScalar( 200,200,200));*/
-                    }
-
-                    
-                    calcDistanceByPos(laserDotArr[y], y, frameSz.width,&result);
-//printf("%.2f %.2f %.2f\n", result.distance,result.yaw * 180.0f/PI + currentAngle10/10, result.pitch* 180.0f/PI);
-
-                    
-                    float px, py ,pz ;
-                    px = result.distance * cos(result.pitch) * sin(result.yaw  + currentAngle10*PI/10.0f/180.0f);
-                    py = result.distance * cos(result.pitch) * cos(result.yaw  + currentAngle10*PI/10.0f/180.0f);
-                    pz = result.distance * sin(-result.pitch);
-
-                    if (fabs(px)>5000 || fabs(py)>5000 || fabs(pz)>1000) 
-continue;
- 
-                    
-
-
-                    if (y % cloud_pt_row_delta == 0)
-                    {
-                        CloudPoint & currentpt = cloudpt_col[y/cloud_pt_row_delta];
-
-
-                        currentpt.X = px;
-                        currentpt.Y = py;
-                        currentpt.Z = pz;
-
-                       // if (cloudpoint_file)
-                            fprintf(dumpfile, "%.2f %.2f %.2f\n", px, py, pz );
-                    }
-
-                
-
-            }            
-            
-            
-            
-
-           
+        //cvCircle(undistorted,cvPoint(laserDotArr[y],y),2,
+        //y == frameSz.height/2?CV_RGB(255,0,0):CV_RGB(0,255,255));
         
+        char txtMsg[200];
+        if ( y == frameSz.height/2) {
+            sprintf(txtMsg,"x=%.3f.", laserDotArr[y]);
+            printf("current x=%.3f\n", laserDotArr[y]);
+            printf("distance from middle frame is x=%.3f\n",(laserDotArr[y]-(frameSz.width/2)));
+            printf("-------------------------------------------------------------------------\n");
+            /*cvPutText(undistorted,txtMsg,cvPoint(laserDotArr[y],y),stdFont, 
+            cvScalar( 200,200,200));*/
+        }
+
+
+        calcDistanceByPos(laserDotArr[y], y, frameSz.width,&result);
+        //printf("%.2f %.2f %.2f\n", result.distance,result.yaw * 180.0f/PI + currentAngle10/10, result.pitch* 180.0f/PI);
+        
+        
+        float px, py ,pz ;
+        px = result.distance * cos(result.pitch) * sin(result.yaw  + currentAngle10*PI/10.0f/180.0f);
+        py = result.distance * cos(result.pitch) * cos(result.yaw  + currentAngle10*PI/10.0f/180.0f);
+        pz = result.distance * sin(-result.pitch);
+        
+        if (fabs(px)>5000 || fabs(py)>5000 || fabs(pz)>1000) 
+            continue;
+
+
+
+
+        if (y % cloud_pt_row_delta == 0)
+        {
+            CloudPoint & currentpt = cloudpt_col[y/cloud_pt_row_delta];
+            
+            
+            currentpt.X = px;
+            currentpt.Y = py;
+            currentpt.Z = pz;
+            
+            // if (cloudpoint_file)
+            fprintf(dumpfile, "%.2f %.2f %.2f\n", px, py, pz );
+        }
+
+
+
+    }   
 		
 	Mat imgMat(cloned);
 	imwrite("picture.png", imgMat);
 	Mat imgMat2(grayFrame);
 	imwrite("picture2.png", imgMat2);
-        delete [] cloudpt_col;
-        //if (cloudpoint_file)
-            fclose(dumpfile);
-        delete [] laserDotArr;
-		//delete [] cam_input;
-		//delete [] dumpfile;
-        cvReleaseImage(&grayFrame);
-        cvReleaseImage(&undistorted);
-		return 0;
-	}
+    delete [] cloudpt_col;
+    //if (cloudpoint_file)
+        fclose(dumpfile);
+    delete [] laserDotArr;
+    //delete [] cam_input;
+    //delete [] dumpfile;
+    cvReleaseImage(&grayFrame);
+    cvReleaseImage(&undistorted);
+    return 0;
+}
 
 
    /*  VideoCapture capture(0);
