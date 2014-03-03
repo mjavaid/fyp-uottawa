@@ -127,9 +127,6 @@ int main() {
         if (fabs(px)>5000 || fabs(py)>5000 || fabs(pz)>1000) 
             continue;
 
-
-
-
         if (y % cloud_pt_row_delta == 0)
         {
             CloudPoint & currentpt = cloudpt_col[y/cloud_pt_row_delta];
@@ -142,9 +139,6 @@ int main() {
             // if (cloudpoint_file)
             fprintf(dumpfile, "%.2f %.2f %.2f\n", px, py, pz );
         }
-
-
-
     }   
 		
 	Mat imgMat(cloned);

@@ -3,18 +3,7 @@
 # pixel row. Returns the result of the calculation to the user.
 """
 import cv2.cv as cv
-from math import pi as PI
 from math import tan, fabs, asin
-
-class CloudPoint():
-    PointData = None
-    
-    def __init__(self, args=None):
-        if not args == None:
-            self.PointData = args
-    
-    def printAttribs(self):
-        print self.PointData
         
 def findLaserCenterByRow(imgRow, rowWidth):
     THRESHOLD_MIN_PWR = 25
@@ -43,9 +32,9 @@ def findLaserCenterByRow(imgRow, rowWidth):
 def calcDistanceByPos(x, y, imgWidth):
     OFFSET = -0.03460372108
     GAIN = 0.0015772
-    pixels_from_center = x - (imgWidth / 2)
+    pfc = x - (imgWidth / 2)
     
-    distance = 6.1 / tan( pixels_from_center * GAIN * OFFSET )
+    distance = 6.1 / tan( pfc * GAIN * OFFSET )
     
     CENTER_Y = 239
     if not y == CENTER_Y:
@@ -56,20 +45,16 @@ def calcDistanceByPos(x, y, imgWidth):
     
     return distance
         
-# Currently only takes a pictures and saves it in output.jpg (NO ERROR HANDLING etc)
-def take_picture():
-    capture = cv.CaptureFromCAM(0)
+def take_picture(camIndex=0):
+    capture = cv.CaptureFromCAM(camIndex)
     img = cv.QueryFrame(capture)
     
     imgGray = cv.CreateImage((img.width, img.height), cv.IPL_DEPTH_8U, 1)
     cv.CvtColor(img, imgGray, cv.CV_RGB2GRAY)
-    cv.Smooth( imgGray, imgGray, cv.CV_GAUSSIAN, 3, 3 )
+    cv.Smooth(imgGray, imgGray, cv.CV_GAUSSIAN, 3, 3)
     
     cv.SaveImage('output.jpg', img)
     cv.SaveImage('outputG.jpg', imgGray)
-    
-    cp = CloudPoint({"X":1,"Y":2,"Z":3,"H":4,"Row":5,"Col":6})
-    cp.printAttribs()
     
     brightestPoints = []
     for row in range(imgGray.height):
