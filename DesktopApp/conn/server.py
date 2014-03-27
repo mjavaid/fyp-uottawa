@@ -2,6 +2,8 @@ from socket import *
 import thread
 import random
 
+import argparse
+
 BUFF = 1024
 HOST = 'localhost'# must be input parameter 
 PORT = 5005 # must be input parameter
@@ -44,3 +46,8 @@ if __name__=='__main__':
         thread.start_new_thread(handler, (clientsock, addr))
 
 serversock.close()
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-c','--config', help='Server configuration file')
+    args = parser.parse_args()
