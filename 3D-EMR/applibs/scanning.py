@@ -10,8 +10,8 @@ DUTY_SPAN = MAX_DUTY - MIN_DUTY
 THRESHOLD_MIN_PWR = 25
 
 def calcDistanceByPos(x, y, imgWidth):
-    OFFSET = -1.554904 #-0.03460372108
-    GAIN = 0.014967  #0.0015772
+    OFFSET = -0.5609729362 #-0.03460372108
+    GAIN = 0.001575387042  #0.014967  #0.0015772
     pfc = fabs(x - (imgWidth / 2))
     
     distance = 6.1 / tan( pfc * GAIN + OFFSET )
@@ -37,7 +37,7 @@ def extract_distances():
     for i in range(20, 181):
         print "Processing... %s" % i
         imgFrame = cv2.imread('Pictures/res-%s.jpg' % i, 0)
-        print "test1"
+        print "test1", imgFrame
         """imgGray = cv.CreateImageHeader((imgFrame.shape[1], imgFrame.shape[0]), cv.IPL_DEPTH_8U, 3)
         print "test2"
         cv.SetData(imgGray, imgFrame.tostring(), imgFrame.dtype.itemsize * 3 * imgFrame.shape[1])

@@ -8,7 +8,7 @@ from movement import executeMovement as em
 from scanning import scan
 
 BUFF = 1024
-HOST = '192.168.1.100' # must be input parameter 
+HOST = '192.168.1.101' # must be input parameter 
 PORT = 5005 # must be input parameter
 
 def response(key):
@@ -22,6 +22,7 @@ def handleMove(ARGS=None):
     print "move"
     if ARGS == None: return
     em([ARGS[1], ARGS[2]])
+    print "done"
 
 def handleDisconnect(addr=None):
     print "disconnected:", addr

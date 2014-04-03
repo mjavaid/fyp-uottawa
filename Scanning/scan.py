@@ -12,21 +12,25 @@ import json
 THRESHOLD_MIN_PWR = 25
 
 def calcDistanceByPos(x, y, imgWidth):
-    OFFSET = -1.554904 #-0.03460372108
-    GAIN = 0.014967  #0.0015772
-    print imgWidth, x
-    pfc = fabs(x - (imgWidth / 2))
+    OFFSET = -0.5609729362 #-0.03460372108
+    GAIN = 0.001575387042  #0.014967  #0.0015772
+    print imgWidth, x[0]
+    pfc = fabs(x[0] - (imgWidth / 2))
     
     distance = 6.1 / tan( pfc * GAIN + OFFSET )
     
-    CENTER_Y, thetaZ = 239, 0
+    CENTER_Y, thetaZ = 0, 0
+    
+    y = abs(239 - y)
+    
     if not y == CENTER_Y and distance > y:
+        print distance, y
         y = fabs(y - CENTER_Y)
         y *= 0.02645833333
         thetaZ = asin(y / distance)
         distance = y / tan( thetaZ )
     
-    return distance, thetaZ
+    return abs(distance), thetaZ
 
 def findLaserCenterByRow(imgRow=None):
     if max(imgRow) < THRESHOLD_MIN_PWR or imgRow == None: return -1
@@ -60,8 +64,8 @@ def take_picture2():
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     
         # define range of red color in HSV
-        lower_red = np.array([140,50,50])
-        upper_red = np.array([180,255,255])
+        lower_red = np.array([155,50,50])
+        upper_red = np.array([185,255,255])
     
         # Threshold the HSV image to get only blue colors
         mask = cv2.inRange(hsv, lower_red, upper_red)
@@ -81,11 +85,13 @@ def take_picture2():
     
     brightestPoints = np.apply_along_axis(findLaserCenterByRow, axis=1, arr=res2)
     
+    thetaX = 0
+    
     scanOutput = []
     for y in range(len(brightestPoints)):
         distance, thetaZ = calcDistanceByPos(brightestPoints[y], y, 640)
         scanOutput.append({
-            'x': brightestPoints[y],
+            'x': brightestPoints[y][0],
             'y': y,
             'distance': distance,
             'thetaZ': thetaZ,
@@ -122,6 +128,8 @@ def take_picture(camIndex=-1, thetaX=0):
     openCV2npArr = np.asarray( imgGray[:,:] )
     brightestPoints = np.apply_along_axis(findLaserCenterByRow, axis=1, arr=openCV2npArr)
     
+    thetaX = 0
+    
     scanOutput = []
     for y in range(len(brightestPoints)):
         distance, thetaZ = calcDistanceByPos(brightestPoints[y], y, 640)
@@ -136,7 +144,7 @@ def take_picture(camIndex=-1, thetaX=0):
     with open("out-%s.txt" % thetaX, "w") as outfile:
         json.dump(scanOutput, outfile, indent=4)
  
-    #del(capture)
+    del(capture)
     
 if __name__=='__main__':
     take_picture2()
