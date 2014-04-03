@@ -43,7 +43,7 @@ def take_picture2():
     cap = cv2.VideoCapture(-1)
     ret, frame = cap.read()
     
-    for i in range(20):
+    for i in range(30):
         ret, frame = cap.read()
         #grayFrame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         
@@ -74,10 +74,10 @@ def take_picture2():
         mask2[0:640,430:550] = 255
         res2 = cv2.bitwise_and(res,res,mask = mask2)
     
-        cv2.imwrite('frame.jpg',frame)
-        cv2.imwrite('mask.jpg',mask)
-        cv2.imwrite('res.jpg',res)
-        cv2.imwrite('imask.jpg', res2)
+        cv2.imwrite('frame-%s.jpg' % i,frame)
+        cv2.imwrite('mask-%s.jpg' % i,mask)
+        cv2.imwrite('res-%s.jpg' % i,res)
+        cv2.imwrite('imask-%s.jpg' % i, res2)
     
     brightestPoints = np.apply_along_axis(findLaserCenterByRow, axis=1, arr=res2)
     

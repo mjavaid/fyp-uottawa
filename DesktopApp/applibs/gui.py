@@ -189,6 +189,9 @@ class Application(Tk):
     
     def executeHandler(self):
         print("TODO: Execute")
+        cmd = self.COMMAND.get()
+        self.COMMAND.set("")
+        print(conn.sendMessage(cmd))
     
     def aboutHandler(self):
         print("TODO: About")
@@ -224,7 +227,7 @@ class connectionThread(threading.Thread):
         if self.host == None or self.port == None: dest = None
         else: dest = [self.host, self.port]
         conn.connect(dest)
-        SEND_DATA_CMD = "GET_DATA_STREAM"
+        """SEND_DATA_CMD = "GET_DATA_STREAM"
         _, data = conn.sendMessage(SEND_DATA_CMD)
         if data == "ACK_GDS":
             while not closeConnection:
@@ -232,7 +235,10 @@ class connectionThread(threading.Thread):
                 _, data = conn.sendMessage(SEND_ACK)
                 plotData = data.split(",")
                 plotData[0], plotData[1] = int(plotData[0]), int(plotData[1])
-                App.plotHandler(plotData)
+                App.plotHandler(plotData)"""
+        while not closeConnection:
+            continue
+        print "DISCONNECTING..."
         conn.closeConnection()
 
 def createApplication():

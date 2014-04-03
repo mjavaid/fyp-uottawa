@@ -32,6 +32,40 @@ def findLaserCenterByRow(imgRow=None):
     if max(imgRow) < THRESHOLD_MIN_PWR or imgRow == None: return -1
     else: return np.argmax(imgRow)
 
+def extract_distances():
+    print "distances"
+    for i in range(20, 181):
+        print "Processing... %s" % i
+        imgFrame = cv2.imread('Pictures/res-%s.jpg' % i, 0)
+        print "test1"
+        """imgGray = cv.CreateImageHeader((imgFrame.shape[1], imgFrame.shape[0]), cv.IPL_DEPTH_8U, 3)
+        print "test2"
+        cv.SetData(imgGray, imgFrame.tostring(), imgFrame.dtype.itemsize * 3 * imgFrame.shape[1])
+        print "test3"
+        print "---", imgFrame
+        print "---", imgGray
+        
+        openCV2npArr = np.asarray( imgGray[:,:] )"""
+        #print "test4", openCV2npArr
+        brightestPoints = np.apply_along_axis(findLaserCenterByRow, axis=1, arr=imgFrame)
+        print "test5"
+
+        scanOutput = []
+        print "test6"
+        for y in range(len(brightestPoints)):
+            distance, thetaZ = calcDistanceByPos(brightestPoints[y], y, imgGray.width)
+            scanOutput.append({
+                'x': brightestPoints[y],
+                'y': y,
+                'distance': distance,
+                'thetaZ': thetaZ,
+                'thetaX': i
+            })
+        print "test7"
+    
+        with open("Output/out-move-%s.txt" % i, "w") as outfile:
+            json.dump(scanOutput, outfile, indent=4)
+
 def scan():
     import Adafruit_BBIO.PWM as PWM
     import Adafruit_BBIO.GPIO as GPIO
@@ -48,37 +82,44 @@ def scan():
     
     for i in range(181):
         angle_f = float(i)
+        print "Taken %i" % i
         duty = 100 - ((angle_f / 180) * DUTY_SPAN + MIN_DUTY)
         PWM.set_duty_cycle(CAMERA_PIN, duty)
 
         ret, frame = cap.read()
-        grayFrame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        #grayFrame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         
-        img = cv.CreateImageHeader((frame.shape[1], frame.shape[0]), cv.IPL_DEPTH_8U, 3)
+        """img = cv.CreateImageHeader((frame.shape[1], frame.shape[0]), cv.IPL_DEPTH_8U, 3)
         cv.SetData(img, frame.tostring(), frame.dtype.itemsize * 3 * frame.shape[1])
         
         imgGray = cv.CreateImage((img.width, img.height), cv.IPL_DEPTH_8U, 1)
         cv.CvtColor(img, imgGray, cv.CV_RGB2GRAY)
         
-        cv2.imwrite('img-Gray-%s.jpg' % i, grayFrame)
-        cv.SaveImage("img-Image-%s.jpg" % i, imgGray)
+        #cv2.imwrite('Pictures/img-Gray-%s.jpg' % i, grayFrame)
+        cv.SaveImage('Pictures/img-Image-%s.jpg' % i, imgGray)"""
+    
+        # Convert BGR to HSV
+        hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+    
+        # define range of red color in HSV
+        lower_red = np.array([155,50,50])
+        upper_red = np.array([185,255,255])
+    
+        # Threshold the HSV image to get only blue colors
+        mask = cv2.inRange(hsv, lower_red, upper_red)
+    
+        # Bitwise-AND mask and original image
+        res = cv2.bitwise_and(frame,frame, mask= mask)
         
-        openCV2npArr = np.asarray( imgGray[:,:] )
-        brightestPoints = np.apply_along_axis(findLaserCenterByRow, axis=1, arr=openCV2npArr)
-
-        scanOutput = []
-        for y in range(len(brightestPoints)):
-            distance, thetaZ = calcDistanceByPos(brightestPoints[y], y, imgGray.width)
-            scanOutput.append({
-                'x': brightestPoints[y],
-                'y': y,
-                'distance': distance,
-                'thetaZ': thetaZ,
-                'thetaX': i
-            })
-        
-        with open("out-move-%s.txt" % i, "w") as outfile:
-            json.dump(scanOutput, outfile, indent=4)
+        # pfc range for laser
+        mask2 = np.zeros(res.shape[:2],np.uint8)
+        mask2[0:640,430:550] = 255
+        res2 = cv2.bitwise_and(res,res,mask = mask2)
+    
+        cv2.imwrite('Pictures/frame-%s.jpg' % i,frame)
+        cv2.imwrite('Pictures/mask-%s.jpg' % i,mask)
+        cv2.imwrite('Pictures/res-%s.jpg' % i,res)
+        cv2.imwrite('Pictures/outputimg-%s.jpg' % i, res2)
     
     cap.release()
     
@@ -86,7 +127,9 @@ def scan():
     PWM.cleanup()
     
     GPIO.output(LASER_PIN, GPIO.LOW)
-    GPIO.cleanup()  
+    GPIO.cleanup()
+    
+    #extract_distances()
 
 if __name__ == "__main__":
     print "scanning.py"

@@ -25,6 +25,7 @@ def connect(dest=None):
         ERR = CONN_TIMEOUT_ERR
     except ConnectionError:
         ERR = CONN_REFUSED_ERR
+    print "ERROR:",ERR
     return ERR
 
 def isConnected():
@@ -34,6 +35,7 @@ def isConnected():
 def sendMessage(msg):
     global CONNECTION, NO_ERR, NOT_CONNECTED_ERR
     ERR = NO_ERR
+    data = None
     if isConnected():
         CONNECTION.send(msg)
         ERR = NO_ERR

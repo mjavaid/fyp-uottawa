@@ -2,13 +2,8 @@ from socket import *
 import thread
 import random
 
-import movement as mv
-from movement import executeMovement as em
-
-from scanning import scan
-
 BUFF = 1024
-HOST = '192.168.1.100' # must be input parameter 
+HOST = 'localhost'# must be input parameter 
 PORT = 5005 # must be input parameter
 
 def response(key):
@@ -16,12 +11,9 @@ def response(key):
 
 def handleScan():
     print "scan"
-    scan()
     
-def handleMove(ARGS=None):
+def handleMove():
     print "move"
-    if ARGS == None: return
-    em([ARGS[1], ARGS[2]])
 
 def handleDisconnect(addr=None):
     print "disconnected:", addr
@@ -30,8 +22,6 @@ def handler(clientsock,addr):
     while 1:
         command = clientsock.recv(BUFF)
         command = command.upper()
-        ARGS = command.split(" ")
-        command = ARGS[0]
         if not command:
             handleDisconnect(addr)
             break
@@ -42,7 +32,7 @@ def handler(clientsock,addr):
             response = "ACK_CC"
             break
         elif command == "MOVE":
-            handleMove(ARGS)
+            handleMove()
             response = "MOVED"
         elif command == "SCAN":
             handleScan()
@@ -61,15 +51,10 @@ if __name__=='__main__':
     serversock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
     serversock.bind(ADDR)
     serversock.listen(5)
-    
-    mv.enable()
-    
     while 1:
         print 'waiting for connection... listening on port', PORT
         clientsock, addr = serversock.accept()
         print '...connected from:', addr
         thread.start_new_thread(handler, (clientsock, addr))
-    
-    mv.disable()
 
 serversock.close()

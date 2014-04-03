@@ -1,4 +1,5 @@
 import Adafruit_BBIO.PWM as PWM
+from time import sleep
 
 # PLACEHOLDERS: Substitute variables with actual values
 TIME_PER_TILE = 2.62 #in sceonds
@@ -22,8 +23,8 @@ DIRECTIONS = ["FORWARD", "BACKWARDS", "LEFT", "RIGHT"]
 def move_forward():
     global ENABLED, RUNNING
     if not ENABLED: return
-    PWM.start(LEFT_SERVO_TX, LEFT_SERVO_ON, SERVO_FREQUENCY,LEFT_SERVO_POLARITY)
-    PWM.start(RIGHT_SERVO_TX, RIGHT_SERVO_ON,SERVO_FREQUENCY,RIGHT_SERVO_POLARITY)
+    PWM.start(LEFT_SERVO_TX, 10, 33, 0)
+    PWM.start(RIGHT_SERVO_TX, 98, 33, 1)
     RUNNING = True
 
 def move_backwards():
@@ -64,14 +65,14 @@ def disable():
 def enable():
     global ENABLED, RUNNING   
     if ENABLED: return
-    #PWM.start(LEFT_SERVO_TX, LEFT_SERVO_OFF, SERVO_FREQUENCY, LEFT_SERVO_POLARITY)
-    #PWM.start(RIGHT_SERVO_TX, RIGHT_SERVO_OFF, SERVO_FREQUENCY, RIGHT_SERVO_POLARITY)
+    PWM.start(LEFT_SERVO_TX, LEFT_SERVO_OFF, 33, 0)
+    PWM.start(RIGHT_SERVO_TX, RIGHT_SERVO_OFF, 33, 1)
     ENABLED = True
     RUNNING = False
     
 def executeMovement(ARGS):
-    direction = ARGS[0]
-    value = ARGS[1]
+    direction = ARGS[0].upper()
+    value = int(ARGS[1])
     factor = DEGREE_TURN_TIME
     if direction == "BACKWARDS":
         move_backwards()
@@ -79,8 +80,12 @@ def executeMovement(ARGS):
     elif direction == "FORWARD":
         move_forward()
         factor = TIME_PER_TILE
-    elif direction == "LEFT": turn_left()
-    elif direction == "RIGHT": turn_right()
+    elif direction == "LEFT": 
+        turn_left()
+        value %= 360
+    elif direction == "RIGHT": 
+        turn_right()
+        value %= 360
     sleep(value * factor)
     stop()
     
