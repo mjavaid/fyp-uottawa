@@ -8,60 +8,41 @@ MIN_DUTY = 3
 MAX_DUTY = 14.5
 DUTY_SPAN = MAX_DUTY - MIN_DUTY
 THRESHOLD_MIN_PWR = 25
+SCAN_RESOLUTION = 1.125 # 180 / 160
+IMG_WIDTH = 640
+IMG_HEIGHT = 480
+IMG_X_CENTER = (IMG_WIDTH / 2) - 1
+IMG_Y_CENTER = (IMG_HEIGHT / 2) - 1
+IMG_OFFSET = 20
 
-def calcDistanceByPos(x, y, imgWidth):
-    OFFSET = -0.5609729362 #-0.03460372108
-    GAIN = 0.001575387042  #0.014967  #0.0015772
+def calcDistanceByPos(x, imgWidth):
+    if x < 0: return -1
+    OFFSET = -0.02510375038  #-0.5609729362 #-0.03460372108
+    GAIN = 0.001135535017 #0.001575387042  #0.014967  #0.0015772
     pfc = fabs(x - (imgWidth / 2))
-    
     distance = 6.1 / tan( pfc * GAIN + OFFSET )
-    
-    CENTER_Y, thetaZ = 239, 0
-    if not y == CENTER_Y:
-        y = fabs(y - CENTER_Y)
-        y *= 0.02645833333
-        if distance > y:
-            thetaZ = degrees(asin(y / distance))
-            distance = y / tan( thetaZ )
-        else:
-            thetaZ = -1
-    
-    return distance, thetaZ
+    return abs(distance)
 
 def findLaserCenterByRow(imgRow=None):
     if max(imgRow) < THRESHOLD_MIN_PWR or imgRow == None: return -1
     else: return np.argmax(imgRow)
 
 def extract_distances():
-    print "distances"
-    for i in range(20, 181):
+    for i in range(IMG_OFFSET, 181):
         print "Processing... %s" % i
         imgFrame = cv2.imread('Pictures/res-%s.jpg' % i, 0)
-        print "test1", imgFrame
-        """imgGray = cv.CreateImageHeader((imgFrame.shape[1], imgFrame.shape[0]), cv.IPL_DEPTH_8U, 3)
-        print "test2"
-        cv.SetData(imgGray, imgFrame.tostring(), imgFrame.dtype.itemsize * 3 * imgFrame.shape[1])
-        print "test3"
-        print "---", imgFrame
-        print "---", imgGray
         
-        openCV2npArr = np.asarray( imgGray[:,:] )"""
-        #print "test4", openCV2npArr
         brightestPoints = np.apply_along_axis(findLaserCenterByRow, axis=1, arr=imgFrame)
-        print "test5"
 
         scanOutput = []
-        print "test6"
         for y in range(len(brightestPoints)):
-            distance, thetaZ = calcDistanceByPos(brightestPoints[y], y, imgGray.width)
+            distance = calcDistanceByPos(brightestPoints[y], IMG_WIDTH)
             scanOutput.append({
-                'x': brightestPoints[y],
-                'y': y,
+                'x': brightestPoints[y] - IMG_X_CENTER,
+                'y': IMG_Y_CENTER - y,
                 'distance': distance,
-                'thetaZ': thetaZ,
-                'thetaX': i
+                'thetaX': (i - IMG_OFFSET) * SCAN_RESOLUTION
             })
-        print "test7"
     
         with open("Output/out-move-%s.txt" % i, "w") as outfile:
             json.dump(scanOutput, outfile, indent=4)
@@ -113,7 +94,7 @@ def scan():
         
         # pfc range for laser
         mask2 = np.zeros(res.shape[:2],np.uint8)
-        mask2[0:640,430:550] = 255
+        mask2[0:640,430:570] = 255
         res2 = cv2.bitwise_and(res,res,mask = mask2)
     
         cv2.imwrite('Pictures/frame-%s.jpg' % i,frame)
@@ -129,7 +110,7 @@ def scan():
     GPIO.output(LASER_PIN, GPIO.LOW)
     GPIO.cleanup()
     
-    #extract_distances()
+    extract_distances()
 
 if __name__ == "__main__":
     print "scanning.py"

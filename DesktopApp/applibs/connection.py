@@ -47,6 +47,7 @@ def sendMessage(msg):
 
 def handleMessage(msg):
     print("TODO: Handle Message")
+    print "MESSAGE:::",msg
     return msg
 
 def closeConnection():

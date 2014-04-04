@@ -27,12 +27,18 @@ from matplotlib.figure import Figure
 import threading
 import connection as conn
 
+from math import sin, cos, radians
+
 App = None
 Connection = None
 closeConnection = False
 
 class Application(Tk):
     COMMAND = None
+    X_OFFSET = 0
+    Y_OFFSET = 0
+    FACING_ANGLE = 90
+    LENGTH_PER_MOVEMENT = 34
     
     def __init__(self, *args, **kwargs):
         Tk.__init__(self, *args, **kwargs)
@@ -191,8 +197,59 @@ class Application(Tk):
         print("TODO: Execute")
         cmd = self.COMMAND.get()
         self.COMMAND.set("")
-        print(conn.sendMessage(cmd))
-    
+        cmd = cmd.upper()
+        _, response = conn.sendMessage(cmd)
+        if cmd.upper() == "SCAN":
+            done = False
+            overflow = False
+            dOverflow = 0
+            while not done:
+                vectors = response.split(";")
+                for vector in vectors:
+                    args = vector.split(",")
+                    if len(args) == 2:
+                        if overflow:
+                            h, angle = dOverflow, args[0]
+                            overflow = False
+                            dOverflow = 0
+                        else:
+                            h, angle = args[0], args[1]
+                        h, angle = float(h), float(angle)
+                        if h > 0:
+                            A = ((90 + self.FACING_ANGLE) % 360 ) - angle
+                            if A < 0: 
+                                A = 360 + A
+                            x, y = (cos(radians(A)) * h) + self.X_OFFSET, (sin(radians(A)) * h) + self.Y_OFFSET
+                            print x,y,h,angle
+                            App.plotHandler([x, y])
+                    else:
+                        overflow = True
+                        dOverflow = args[0]
+                if angle == 180.0:
+                    done = True
+                else:
+                    _, response = conn.sendMessage("")
+        elif "MOVE" in cmd:
+            print "MOVE"
+            args = cmd.split(" ")
+            print args
+            n = int(args[2])
+            direction = args[1]
+            if direction == "RIGHT":
+                n = n % 360
+                n = 360 - n
+                self.FACING_ANGLE = (self.FACING_ANGLE + n) % 360
+            elif direction == "LEFT":
+                n = n % 360
+                self.FACING_ANGLE = (self.FACING_ANGLE + n) % 360
+            elif direction == "FORWARD":
+                self.X_OFFSET = (cos(radians(self.FACING_ANGLE)) * n * self.LENGTH_PER_MOVEMENT) + self.X_OFFSET
+                self.Y_OFFSET = (sin(radians(self.FACING_ANGLE)) * n * self.LENGTH_PER_MOVEMENT) + self.Y_OFFSET
+            elif direction == "BACKWARDS":
+                A = ((180 + self.FACING_ANGLE) % 360)
+                self.X_OFFSET = (cos(radians(A)) * n * self.LENGTH_PER_MOVEMENT) + self.X_OFFSET
+                self.Y_OFFSET = (sin(radians(A)) * n * self.LENGTH_PER_MOVEMENT) + self.Y_OFFSET
+        
     def aboutHandler(self):
         print("TODO: About")
     

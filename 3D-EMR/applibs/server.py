@@ -2,13 +2,16 @@ from socket import *
 import thread
 import random
 
+import json
+
 import movement as mv
 from movement import executeMovement as em
 
 from scanning import scan
+#from opencv import extract_distances as ed
 
 BUFF = 1024
-HOST = '192.168.1.101' # must be input parameter 
+HOST = 'localhost' #'192.168.1.101' # must be input parameter 
 PORT = 5005 # must be input parameter
 
 def response(key):
@@ -17,6 +20,7 @@ def response(key):
 def handleScan():
     print "scan"
     scan()
+    #ed()
     
 def handleMove(ARGS=None):
     print "move"
@@ -47,11 +51,14 @@ def handler(clientsock,addr):
             response = "MOVED"
         elif command == "SCAN":
             handleScan()
-            response = "SCANNED"
+            for i in range(20, 181):
+                data = json.load(open('Output/out-move-%s.txt' % i))
+                response += str(data[239]['distance']) + ',' + str(data[239]['thetaX']) + ';'
+            #response = "SCANNED"
         else:
-            response = str(random.randint(1, 100))+","+str(random.randint(1, 50))
+            response = None
             
-        clientsock.send(response)
+        clientsock.send(str(response))
 
     clientsock.close()
     print addr, "- closed connection" #log on console
