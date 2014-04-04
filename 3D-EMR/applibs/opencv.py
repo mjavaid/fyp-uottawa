@@ -1,9 +1,12 @@
 import numpy as np
-from math import tan, fabs, asin, degrees
+from math import tan, fabs, asin, degrees, cos, radians
 import cv2
 import cv2.cv as cv
 import json
 
+MIN_DUTY = 3
+MAX_DUTY = 14.5
+DUTY_SPAN = MAX_DUTY - MIN_DUTY
 THRESHOLD_MIN_PWR = 25
 SCAN_RESOLUTION = 1.125 # 180 / 160
 IMG_WIDTH = 640
@@ -11,6 +14,7 @@ IMG_HEIGHT = 480
 IMG_X_CENTER = (IMG_WIDTH / 2) - 1
 IMG_Y_CENTER = (IMG_HEIGHT / 2) - 1
 IMG_OFFSET = 20
+PIXEL_TO_CM = 0.0264583333
 
 def calcDistanceByPos(x, imgWidth):
     if x < 0: return -1
@@ -25,6 +29,7 @@ def findLaserCenterByRow(imgRow=None):
     else: return np.argmax(imgRow)
 
 def extract_distances():
+    f = open("scan.xyz", "w")
     for i in range(IMG_OFFSET, 181):
         print "Processing... %s" % i
         imgFrame = cv2.imread('Pictures/res-%s.jpg' % i, 0)
@@ -34,15 +39,21 @@ def extract_distances():
         scanOutput = []
         for y in range(len(brightestPoints)):
             distance = calcDistanceByPos(brightestPoints[y], IMG_WIDTH)
-            scanOutput.append({
+            scanEntry = {
                 'x': brightestPoints[y] - IMG_X_CENTER,
                 'y': IMG_Y_CENTER - y,
                 'distance': distance,
                 'thetaX': (i - IMG_OFFSET) * SCAN_RESOLUTION
-            })
+            }
+            scanOutput.append(scanEntry)
+            if not distance < 0 and not distance > 50:
+                xVal = cos(radians(scanEntry['thetaX'])) * distance
+                xyzVector = str(xVal) + " " + str((float(scanEntry["y"]) * PIXEL_TO_CM)) + " " + str(distance) + "\n"
+                f.write(xyzVector)
     
         with open("Output/out-move-%s.txt" % i, "w") as outfile:
             json.dump(scanOutput, outfile, indent=4)
+    f.close()
 
 def mask():
     for i in range(181):

@@ -1,5 +1,5 @@
 import numpy as np
-from math import tan, fabs, asin, degrees
+from math import tan, fabs, asin, degrees, cos, radians
 import cv2
 import cv2.cv as cv
 import json
@@ -14,6 +14,9 @@ IMG_HEIGHT = 480
 IMG_X_CENTER = (IMG_WIDTH / 2) - 1
 IMG_Y_CENTER = (IMG_HEIGHT / 2) - 1
 IMG_OFFSET = 20
+PIXEL_TO_CM = 0.0264583333
+
+XYZ_INDEX = 0
 
 def calcDistanceByPos(x, imgWidth):
     if x < 0: return -1
@@ -28,24 +31,33 @@ def findLaserCenterByRow(imgRow=None):
     else: return np.argmax(imgRow)
 
 def extract_distances():
+    global XYZ_INDEX
+    f = open("Output/scan-%s.xyz" % XYZ_INDEX, "w")
     for i in range(IMG_OFFSET, 181):
         print "Processing... %s" % i
-        imgFrame = cv2.imread('Pictures/res-%s.jpg' % i, 0)
+        imgFrame = cv2.imread('Pictures/outputimg-%s.jpg' % i, 0)
         
         brightestPoints = np.apply_along_axis(findLaserCenterByRow, axis=1, arr=imgFrame)
 
         scanOutput = []
         for y in range(len(brightestPoints)):
             distance = calcDistanceByPos(brightestPoints[y], IMG_WIDTH)
-            scanOutput.append({
+            scanEntry = {
                 'x': brightestPoints[y] - IMG_X_CENTER,
                 'y': IMG_Y_CENTER - y,
                 'distance': distance,
                 'thetaX': (i - IMG_OFFSET) * SCAN_RESOLUTION
-            })
+            }
+            scanOutput.append(scanEntry)
+            if not distance < 0 and not distance > 50:
+                xVal = cos(radians(scanEntry['thetaX'])) * distance
+                xyzVector = str(xVal) + " " + str((float(scanEntry["y"]) * PIXEL_TO_CM)) + " " + str(distance) + "\n"
+                f.write(xyzVector)
     
         with open("Output/out-move-%s.txt" % i, "w") as outfile:
             json.dump(scanOutput, outfile, indent=4)
+    f.close()
+    XYZ_INDEX += 1
 
 def scan():
     import Adafruit_BBIO.PWM as PWM
